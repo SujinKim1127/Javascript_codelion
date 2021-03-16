@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>로또 번호 추첨기 1</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>로또 번호 추첨기</h1>
+    <script>
+        var lotto=[]; // 주석 내용
+        //for (var i = 0; i < 6; i++)
+        while(lotto.length < 6)
+        {
+            var num = parseInt(Math.random() * 45 + 1);
+            if(lotto.indexOf(num) == -1)    // 배열안에 num이 없으면
+            {
+                lotto.push(num);
+            }
+        }
+        lotto.sort((a,b)=>a-b);         // 오름차순
+        for (var i = 0; i < 6; i++)
+        {
+            if(lotto[i] < 11){
+                document.write("<div class = 'ball ball1'>" + lotto[i] + "</div>");
+            }else if (21 > lotto[i] && lotto[i] > 10){
+                document.write("<div class = 'ball ball2'>" + lotto[i] + "</div>");
+            }else if (31 > lotto[i] && lotto[i] > 20){
+                document.write("<div class = 'ball ball3'>" + lotto[i] + "</div>");
+            }else if (41 > lotto[i] && lotto[i] > 30){
+                document.write("<div class = 'ball ball4'>" + lotto[i] + "</div>");
+            }else if (lotto[i] > 40){
+                document.write("<div class = 'ball ball5'>" + lotto[i] + "</div>");
+            }
+        }
+    </script>
+</body>
+</html>
