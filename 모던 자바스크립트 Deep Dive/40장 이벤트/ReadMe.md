@@ -191,3 +191,177 @@ on 접두사 사용X
 ```
 
 클릭 이벤트에 의해 생성된 이벤트 객체는 이벤트 핸들러의 첫번째 인수로 전달되어 매개변수 e에 암묵적으로 할당됨 → 브라우저가 이벤트 핸들러를 호출할 때 이벤트 객체를 인수로 전달하기 때문
+
+<br>
+
+<br>
+
+
+## 6. 이벤트 전파
+
+: DOM 트리 상에 존재하는 DOM 요소 노드에서 발생한 이벤트는 DOM 트리를 통해 전파됨 
+
+```html
+<body>
+	<ul id="fruits">
+		<li id="apple">Apple</li>
+		<li id="banana">Banana</li>
+		<li id="oranage">Orange</li>
+	</ul>
+</body>
+```
+
+`<ul>` 요소의 두 번째 자식 요소인 `<li>` 요소를 클릭하면 클릭 이벤트 발생
+
+이때 **생성된 이벤트 객체는 이벤트를 발생시킨 DOM 요소인 이벤트 타겟을 중심으로 DOM 트리를 통해 전파됨**
+
+### 3단계로 구분되는 이벤트 전파
+
+![Untitled](%EC%9D%B4%EB%B2%A4%ED%8A%B8%20%EC%A0%84%ED%8C%8C.PNG)
+
+(1) **캡처링 단계(Capturing phase)**: 이벤트가 상위 요소에서 하위 요소 방향으로 전파
+
+(2) **타겟 단계(Target phase)**: 이벤트가 이벤트 타겟에 도달
+
+(3) **버블링 단계(Bubbling phase)**: 이벤트가 하위 요소에서 상위 요소 방향으로 전파
+
+```html
+<!DOCTYPE html>
+<html>
+<body>
+	<ul id="fruits">
+		<li id="apple">Apple</li>
+		<li id="banana">Banana</li>
+		<li id="oranage">Orange</li>
+	</ul>
+	<script>
+		// 이벤트 요소에 핸들러 바인딩
+		const $fruits = document.getElementById('fruits');
+
+		// fruits 요소의 하위 요소인 li 요소를 클릭한 경우 (이벤트 발생시키기)
+		$fruits.addEventListener('click', e => {
+			console.log(`이벤트 단계: ${e.eventPhase}`);    //3: 버블링 단계
+			console.log(`이벤트 타겟: ${e.target}`);       // [object HTML li Element]
+			console.log(`커런트 타겟: ${e.currentTarget}`);   // [object HTML ul Element]
+		});
+	</script>
+</body>
+</html>
+```
+
+→ event.target은 `<li>` 요소 event.currentTarget은 `<ul>` 요소
+
+**캡처링 단계** : `li` 요소를 클릭하면 클릭 이벤트가 발생하여 클릭 이벤트 객체가 생성 → 클릭된 `li` 요소가 이벤트 타겟이 된다. 이때 클릭 이벤트 객체는 window에서 시작해서 이벤트 타깃 방향으로 전파 
+
+**타겟 단계**: 이후 이벤트 객체는 이벤트를 발생시킨 이벤트 타겟에 도달
+
+**버블링 단계** : 이후 이벤트 객체는 이벤트 타겟에서 시작해서 window 방향으로 전파
+
+<br>
+
+`addEventListener` 방식으로 등록한 이벤트 핸들러는 타겟, 버블링, 캡처링 단계의 이벤트도 선별적으로 캐치 가능. 캡처링 단계의 이벤트를 캐치하려면 `addEventListener` 메서드의 3번째 인수로 `true` 전달. 3번째 인수를 생략하거나 `false`를 전달하면 타겟과 버블링 단계의 이벤트만 캐치 가능
+
+```html
+<!DOCTYPE html>
+<html>
+<body>
+	<ul id="fruits">
+		<li id="apple">Apple</li>
+		<li id="banana">Banana</li>
+		<li id="oranage">Orange</li>
+	</ul>
+	<script>
+		// 이벤트 요소에 핸들러 바인딩
+		const $fruits = document.getElementById('fruits');
+		const $banana = document.getElementById('banana');
+
+		// #fruits 요소의 하위 요소인 li 요소를 클릭한 경우 캡처링 단계의 이벤트 캐치
+		$fruits.addEventListener('click', e => {
+			console.log(`이벤트 단계: ${e.eventPhase}`);    // 1: 캡처링 단계
+			console.log(`이벤트 타겟: ${e.target}`);       // [object HTML li Element]
+			console.log(`커런트 타겟: ${e.currentTarget}`);   // [object HTML ul Element]
+		}, true);
+
+		// 타겟 단계의 이벤트를 캐치
+		$banana.addEventListener('click', e => {
+			console.log(`이벤트 단계: ${e.eventPhase}`);    // 2: 타겟 단계
+			console.log(`이벤트 타겟: ${e.target}`);       // [object HTML li Element]
+			console.log(`커런트 타겟: ${e.currentTarget}`);   // [object HTML ul Element]
+		});
+
+		// 버블링 단계의 이벤트 캐치
+		$fruits.addEventListener('click', e => {
+			console.log(`이벤트 단계: ${e.eventPhase}`);    // 3: 버블링 단계
+			console.log(`이벤트 타겟: ${e.target}`);       // [object HTML li Element]
+			console.log(`커런트 타겟: ${e.currentTarget}`);   // [object HTML ul Element]
+		});
+	</script>
+</body>
+</html>
+```
+
+→ 이벤트는 이벤트를 발생시킨 이벤트 타겟과 상위 DOM 요소에서도 캐치 가능
+
+트리를 통해 전파되는 이벤트는 이벤트 패스(이벤트가 통과하는 DOM 트리 상의 경로. `Event.protoyple.composedPath` 메서드로 확인 가능)에 위치한 모든 DOM 요소에서 캐치 가능
+
+<br>
+
+버블링을 통해 이벤트 전파 여부를 나타내는 이벤트 객체의 공통 프로퍼티 `event.bubbles` 값이 모두 false
+
+- 포커스 이벤트: focus/blur
+- 리소스 이벤트: load/unload/abort/error
+- 마우스 이벤트: mouseenter/mouseleave
+
+→ 버블링이 되지 않음 → 이벤트를 캐치하려면 캡처링 단계의 이벤트를 캐치해야함
+
+<br>
+
+⬇ 캡처링과 버블링 단계의 이벤트를 캐치하는 이벤트 핸들러가 혼용되는 경우 ⬇
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+	<style>
+		html, body {hegith: 100%; }
+	</style>
+<body>
+	<p> 버블링과 캡처링 이벤트 <button>버튼</button></p>
+	<script>
+		// 버블링 단계의 이벤트 캐치
+		document.body.addEventListener('click', () => {
+			console.log('Handler for body.');
+		});
+
+		// 캡처링 단계의 이벤트를 캐치
+		document.querySelector('p').addEventListener('click', () => {
+			console.log('Handler for paragraph.');
+		}, true);
+
+		// 타겟 단계의 이벤트를 캐치
+		document.querySelector('button').addEventListener('click', () => {
+			console.log('Handler for button.');
+		});
+	</script>
+</body>
+</html>
+```
+
+→ `body` 요소는 버블링 단계의 이벤트만 캐치
+
+→ `p` 요소는 캡처링 단계의 이벤트만 캐치
+
+이벤트 캡처링 -타겟- 버블링 단계로 전파되므로 만약 `button` 요소에서 클릭 이벤트가 발생하면 먼저 캡처링 단계를 캐치하는 `p` 요소의 이벤트 핸들러가 호출 → 버블링 단계의 이벤트를 캐치하는 `body` 요소의 이벤트 핸들러가 순차적으로 호출
+
+```html
+Handler for paragraph
+Handler for button
+Handler for body
+```
+
+만약 `p` 요소에서 클릭 이벤트가 발생하면 캡처링 단계를 캐치하는 `p` 요소의 이벤트 핸들러가 호출되고 버블링 단계를 캐치하는 `body` 요소의 이벤트 핸들러가 순차적으로 호출
+
+```html
+Handler for paragraph
+Handler for body
+```
