@@ -14,6 +14,8 @@
 
 <br>
 
+<br>
+
 ## `arr.forEach();`
 
 - for문을 대체할 수 있는 고차 함수
@@ -343,3 +345,144 @@ console.log(result);   // [1,2,3,5,4]
 <br>
 
 !!!! **항상 reduce 메서드를 호출할때는 초기값을 전달하는 것이 안전** !!!!
+
+<br>
+<br>
+
+## `arr.some();`
+
+- 자신을 호출한 배열의 요소를 순회하면서 인수로 전달된 콜백함수 호출
+- 콜백 함수의 반환값이 단 한번이라도 참이면 true, 모두 거짓이면 false 반환
+- some 메서드의 콜백 함수는 some 메서드를 호출한 요소값과 인덱스, some 메서드를 호출한 배열 자체, this를 순차적으로 전달받을 수 있다.
+- 두번째 인수로 some 메서드의 콜백 함수 내부에서 this로 사용할 객체를 전달할 수 있다
+- 화살표 함수를 사용하는것이 더 좋다.
+
+```jsx
+console.log([5, 10, 15].some(item => item > 10))    // true
+console.log([5, 10, 15].some(item => item < 1))     // false
+
+// 배열의 요소 중 찾는 단어가 1개 이상 존재하는지 확인
+console.log(['abc', 'def', 'ghi'].some(item => item === 'abc'))     // true
+
+// 빈 배열은 항상 false 반환
+console.log([].some(item => item > 1))      // false
+```
+
+<br>
+
+<br>
+
+
+
+## `arr.every`
+
+- 자신을 호출한 배열의 요소를 순회하면서 인수로 전달된 콜백 함수를 호출
+- 콜백 함수의 반환값이 모두 참이면 true, 단 한번이라도 거짓이면 false 반환
+- 배열의 모든 요소가 콜백 함수를 통해 정의한 조건을 모두 만족하는지 확인하여 그 결과를 불리언 타입으로 반환
+- every 메서드를 호출한 배열이 빈 배열인 경우 항상 true 반환
+- every 메서드의 콜백함수는 every 메서드를 호출한 요소값과 인덱스, every 메서드를 호출한 배열 자체 this를 순차적으로 전달받을 수 있다
+- 두번째 인수로 every 메서드의 콜백 함수 내부에서 this로 사용할 객체를 전달할 수 있다
+- 화살표 함수를 사용하는 것이 더 좋다
+
+```jsx
+console.log([5,10,15].every(item => item > 3))      // true
+console.log([5,10,15].every(item => item > 10))     // false
+
+console.log([].every(item => item > 3))             // true
+```
+
+<br>
+
+<br>
+
+## `arr.find`
+
+- 자신을 호출한 배열의 요소를 순회하면서 인수로 전달된 콜백함수를 호출하여 반환값이 true인 첫번째 요소를 반환
+- 콜백 함수의 반환값이 true인 요소가 존재하지 않는다면 undefined 반환
+- find메서드를 호출한 요소값과 인덱스, find 메서드를 호출한 배열 자체 this를 순차적으로 전달받는다.
+- 두번째 인수로 find 메서드의 콜백함수 내부에서 this로 사용할 객체 전달
+- 화살표 함수 사용하는것이 더 좋다
+
+```jsx
+const users = [
+    { id: 1, name: 'Lee'},
+    { id: 2, name: 'kim'},
+    { id: 4, name: 'park'},
+    { id: 3, name: 'choi'},
+    { id: 3, name: 'kwon'}
+]
+
+console.log(users.find(user => user.id === 2))      //     { id: 2, name: 'kim'}
+console.log(users.find(user => user.id === 3))      //     { id: 3, name: 'choi'}
+```
+
+콜백 함수의 반환값이 true인 첫번째 요소를 반환하므로 결과값이 해당 요소값이다.
+
+<br>
+
+<br>
+
+## `arr.findIndex`
+
+- 자신을 호출한 배열의 요소를 순회하면서 인수로 전달된 콜백 함수를 호출하여 반환값이 true인 첫번째 요소의 인덱스를 반환
+- 콜백 함수의 반환값이 true 인 요소가 존재하지 않으면 -1 반환
+- findIndex 메서드를 호출한 요소값과 인덱스, findIndex 메서드를 호출한 배열 자체 this를 순차적으로 전달받는다
+- 두번째 인수로 findIndex 메서드의 콜백함수 내부에서 this로 사용할 객체를 전달 가능
+- 화산표 함수 사용하는 것이 더 좋다.
+
+```jsx
+const users = [
+    { id: 1, name: 'Lee'},
+    { id: 2, name: 'kim'},
+    { id: 4, name: 'park'},
+    { id: 3, name: 'choi'},
+    { id: 3, name: 'kwon'}
+]
+
+console.log(users.findIndex(user => user.id === 3))         // 3
+console.log(users.findIndex(user => user.name === 'park'))  // 2
+
+// 프로퍼티 키와 프로퍼티 값으로 요소의 인덱스를 구하는 경우
+// 다음과 같이 콜백 함수를 추상화할 수 있다
+function predicate(key, value) {
+    // key와 value를 기억하는 클로저 반환
+    return item => item[key] === value;
+}
+
+console.log(users.findIndex(predicate('id', 2)))            // 1 
+console.log(users.findIndex(predicate('name', 'park')))     // 2
+```
+
+<br>
+
+<br>
+
+## `arr.flatMap`
+
+- map 메서드를 통해 생성된 새로운 배열을 평탄화
+- map 메서드와 flat 메서드를 순차적으로 실행하는 효과가 있다.
+
+```jsx
+const arr = ['hello', 'world'];
+
+// map과 flat 순차적으로 실행
+console.log(arr.map(x => x.split('')).flat())
+// [ 'h', 'e', 'l', 'l', 'o', 'w', 'o', 'r', 'l', 'd' ]
+
+// flatMap은 map을 통해 생성된 새로운 배열을 평탄화 한다.
+console.log(arr.flatMap(x => x.split('')));
+// [ 'h', 'e', 'l', 'l', 'o', 'w', 'o', 'r', 'l', 'd' ]
+```
+
+- flat 메서드처럼 인수를 전달하여 평탄화 깊이를 지정할 수는 없고 1단계만 평탄화한다
+- map 메서드를 통해 생성된 중첩 배열의 평탄화 깊이를 지정해야 한다면 flatMap 메서드를 사용하지 않고 map과 flat을 각각 호출한다.
+
+```jsx
+// 1단계만 평탄화하는 flatMap
+console.log(arr.flatMap((str, index) => [index, [str, str.length]]))
+// [ 0, [ 'hello', 5 ], 1, [ 'world', 5 ] ]
+
+// 평탄화 깊이를 지정해야하면 map과 flat 메서드 각각 호출하기
+console.log(arr.map((str, index) => [index, [str, str.length]]).flat(2))
+// [ 0, 'hello', 5, 1, 'world', 5 ]
+```
