@@ -325,6 +325,8 @@ console.log(person.getName());   // Lee
 
 → `person` 객체의 `getName` 프로퍼티가 가리키는 함수 객체는 `person` 객체에 포함된것이 아니라 독립적으로 존재하는 별도의 객체
 
+<br>
+
 ```jsx
 const anotherPerson = {
 	name: 'Kim'
@@ -348,6 +350,8 @@ console.log(getName());  // ''
 ```
 
 → 메서드 내부의 this는 프로퍼티로 메서드를 가리키고 있는 객체와는 관계가 없고 메서드를 호출한 객체에 바인딩된다
+
+<br>
 
 ```jsx
 function Person(name) {
@@ -375,6 +379,8 @@ console.log(Person.prototype.getName());  // (2) Kim
 
 <br>
 
+<br>
+
 ## 3. 생성자 함수 호출
 
 생성자 함수 내부의 `this` 에는 생성자 함수가 (미래에) 생성할 인스턴스가 바인딩된다.
@@ -398,6 +404,8 @@ console.log(circle1.getDiameter());  // 10
 console.log(circle2.getDiameter());  // 20
 ```
 
+<br>
+
 생성자 함수는 이름 그대로 객체를 생성하는 함수.
 
 일반함수와 동일한 방법으로 생성자 함수를 정의하고 new 연산자와 함께 호출하면 해당 함수는 생성자 함수로 동작한다. 만약 new 연산자와 함께 생성자 함수를 호출하지 않으면 일반 함수로 동작한다.
@@ -416,3 +424,186 @@ console.log(radius);  // 15
 
 <br>
 
+## 4. Function.prototype.apply/call/bind 메서드에 의한 간접호출
+
+`apply`와 `call`은 `this`로 사용할 객체와 인수 리스트를 인수로 전달받아 함수를 호출
+
+`apply`와 `call` 메서드 사용법
+
+```jsx
+/*
+ * 주어진 this 바인딩과 인수 리스트 배열을 사용하여 함수 호출
+ * @param thisArg - this로 사용할 객체
+ * @param argsArray - 함수에게 전달할 인수 리스트의 배열 또는 유사 배열 객체
+ * @returns 호출된 함수의 반환값
+*/
+Function.prototype.apply(thisArgs[, argsArray)]
+
+/*
+ * 주어진 this 바인딩과 , 로 구분된 인수 리스트를 사용하여 함수 호출
+ * @param thisArg - this로 사용할 객체
+ * @param arg1, arg2, ... - 함수에게 전달할 인수 리스트
+ * @returns 호출된 함수의 반환값
+*/
+Function.prototype.call(thisArg[, arg1[, arg2[, ...]]])
+```
+
+<br>
+
+
+```jsx
+function getThisBinding() {
+	return this;
+}
+
+// this로 사용할 객체
+const thisArg = { a: 1 };
+
+console.log(getThisBinding());  // window
+
+//getThisBinding 함수를 호출하면서 인수로 전달한 객체를 getThisBinding 함수의 this에 바인딩
+console.log(getThisBinding.apply(thisArg));  // {a:1}
+console.log(getThisBinding.call(thisArg));   // {a:1}
+```
+
+`apply`와 `call` 메서드의 본질적인 기능은 함수를 호출하는 것
+
+`apply`와 `call` 메서드는 함수를 호출하면서 첫번째 인수로 전달한 객체를 호출한 함수의 `this`에 바인딩
+
+<br>
+
+
+`apply`와 `call` 메서드는 호출한 함수에 인수를 전달하는 방식만 다를 뿐 동일하게 동작
+
+아래 예제는 `getThisBinding` 함수에 인수를 전달하지 않는다.
+
+```jsx
+function getThisBinding() {
+	console.log(arguments);
+	return this;
+}
+
+// this로 사용할 객체
+const thisArg = { a: 1 };
+
+//getThisBinding 함수를 호출하면서 인수로 전달한 객체를 getThisBinding 함수의 this에 바인딩
+// apply 메서드는 호출할 함수의 인수를 배열로 묶어서 전달
+console.log(getThisBinding.apply(thisArg, [1,2,3])); 
+// Arguments(3) [1,2,3, callee: f, Symbol(Symbol.iterator): f]
+// {a:1}
+
+// call 메서드는 호출할 함수의 인수를 쉼표로 구분한 리스트 형식으로 전달
+console.log(getThisBinding.call(thisArg,1,2,3));   
+// Arguments(3) [1,2,3, callee: f, Symbol(Symbol.iterator): f]
+// {a:1}
+```
+
+→ `apply` 메서드는 호출할 함수의 인수를 배열로 묶어 전달
+
+→ `call` 메서드는 호출할 함수의 인수를 쉼표로 구분한 리스트 형식으로 전달
+
+`apply` 와 `call` 메서드는 호출할 <U>함수에 인수를 전달하는 방식만</U> 다르다.
+
+`this`로 사용할 객체를 전달하면서 함수를 호출하는 것은 동일
+
+<br>
+
+`apply` 와 `call` 메서드를 이용하면 `arguments`객체는  `slice()`를 사용할 수 있다
+
+```jsx
+function convertArgsToArray() {
+	console.log(arguments);
+
+	// arguments 객체를 배열로 변환
+	// Array.protoype.slice를 인수 없이 호출하면 배열의 복사본을 생성
+	const arr = Array.prototype.slice.call(arguments);
+	// const arr = Array.prottype.slice.apply(arguments);
+	console.log(arr);
+
+	return arr;
+}
+
+convertArgsToArray(1,2,3);   // [1,2,3]
+```
+
+<br>
+
+`Function.prototype.bind` 메서드는 `apply`와 `call` 메서드와 다르게 **함수 호출 X**
+
+첫번째 인수로 전달한 값으로 `this` 바인딩이 교체된 함수를 새롭게 생성하여 반환
+
+```jsx
+function getThisBinding() {
+	return this;
+}
+
+// this로 사용할 객체
+const thisArg = { a: 1 };
+
+// bind 메서드는 첫번째 인수로 전달한 thisArg로 this 바인딩이 교체된
+// getThisBinding 함수를 새롭게 생성해 반환
+console.log(getThisBinding.bind(thisArg));   // getThisBinding
+// bind 메서드는 함수를 호출하지 않으므로 명시적으로 호출하기
+console.log(getThisBinding.bind(thisArg)());  // {a:1}
+```
+
+<br>
+
+`bind` 메서드는 메서드의 `this`와 메서드 내부의 중첩함수 또는 콜백함수의 `this`가 불일치하는 문제를 해결하기 위해 유용하게 사용됨
+
+```jsx
+const person = {
+	name: 'Lee',
+	foo(callback) {
+		// (1)
+		setTimeout(callback, 100);
+	}
+};
+
+person.foo(function () {
+	console.log(`Hi! my name is ${this.name}.`); // (2) Hi! my name is .
+	// 일반 함수로 호출된 콜백 함수 내부의 this.name은 브라우저 환경에서 window.name과 같다
+	// 브라우저 환경에서 window.name은 브라우저 창의 이름을 나타내는 빌트인 프로퍼티, 기본값은 ''
+	// Node.js 환경에서 this.name은 undefined
+});
+```
+
+`person.foo`의 콜백함수가 호출되기 이전인 
+
+(1)의 시점에서 `this`는 `foo`메서드를 호출한 객체(`person` 객체). 
+
+`person.foo`의 콜백함수가 일반함수로서 호출된 (2)의 시점에서 `this`는 전역객체 `window`를 가리킴
+
+→ `person.foo`의 콜백함수 내부에서 `[this.name](http://this.name)` = `window.name`
+
+`[person.foo](http://person.foo)`의 콜백함수는 외부 함수 `person.foo`를 돕는 **헬퍼함수** 역할을 하기 때문에 외부함수 `person.foo` 내부의 `this`와 콜백함수의 `this`가 다르면 문제 발생!!!
+
+콜백 함수 내부의 `this`를 외부 함수 내부의 `this`와 일치시키기
+
+→ `bind` 메서드를 사용하여 `this` 일치시키기 가능
+
+```jsx
+const person = {
+	name: 'Lee',
+	foo(callback) {
+		// bind 메서드로 callback 함수 내부의 this 바인딩 전달
+		setTimeout(callback.bind(this), 100);
+	}
+};
+
+person.foo(function () {
+	console.log(`Hi! my name is &{this.name}.`);  // Hi! my name is Lee.
+});
+```
+
+<br>
+
+
+<br>
+
+| 함수 호출 방식 | this 바인딩 |
+| --- | --- |
+| 일반 함수 호출 | 전역 객체 |
+| 메서드 호출 | 메서드를 호출한 객체 |
+| 생성자 함수 호출 | 생성자 함수가 (미래에) 생성할 인스턴스 |
+| Function.prototype.apply/call/bind 메서드에 의한 간접 호출 | Function.prototype.apply/call/bind 메서드에 첫번째 인수로 전달한 객체 |
