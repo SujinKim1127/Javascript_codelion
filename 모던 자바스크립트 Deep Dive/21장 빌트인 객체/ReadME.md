@@ -98,3 +98,34 @@ console.log(window.baz()); // 3
 ```
 
 let이나 const로 선언한 전역변수는 전역 객체 프로퍼티 X
+
+### 암묵적 전역
+
+```jsx
+// 전역 변수 x는 호이스팅이 발생한다.
+console.log(x); // undefined
+
+// 전역 변수가 아니라 단지 전역 객체의 프로퍼티인 y는 호이스팅이 발생하지 않는다.
+console.log(y); // ReferenceError: y is not defined
+
+var x = 10; // 전역 변수
+
+function foo() {
+  // 선언하지 않은 식별자에 값을 할당
+  y = 20; // window.y = 20;
+}
+foo();
+
+// 선언하지 않은 식별자 y를 전역에서 참조할 수 있다.
+console.log(x + y); // 30
+```
+
+y = 20을 window.y=20 으로 해석하여 **전역 객체에 프로퍼티**를 동적 생성
+
+→ y는 전역 객체의 프로퍼티가 되어 전역 변수처럼 동작 = 암묵적 전역
+
+y는 변수가 아니므로 변수 호이스팅 발생 X
+
+y는 프로퍼티라서 delete 연산자로 삭제 가능
+
+전역변수는 프로퍼티지만 delete로 삭제 불가능
