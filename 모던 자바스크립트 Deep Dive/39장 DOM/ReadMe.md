@@ -47,3 +47,40 @@ Document Object Model
 노드 객체는 공통된 기능일수록 프로토타입 체인의 상위에
 
 개별적인 고유 기능일수록 프로토타입 체인의 하위에 프로토타입 체인을 구축
+
+## 요소 노드 취득
+
+HTML의 구조나 내용 또는 스타일 등을 동적으로 조작하려면 먼저 요소 노드 취득하기
+
+- id를 이용한 요소 노드 취득
+  - `document.getElementById()`
+  - 언제나 단 하나의 요소 노드를 반환
+- 태그 이름을 이용한 요소 노드 취득
+  - `document.getElementsByTagName()`
+  - 여러 개의 요소 노드 객체를 가지는 DOM 컬렉션 객체 HTMLCollection 객체 반환
+  - document를 통해 호출하여 DOM 전체에서 요소 노드를 탐색하여 반환
+- class를 이용한 요소 노드 취득
+  - document.getElementsByClassName()
+  - 여러 개의 요소 노드 객체를 가지는 DOM 컬렉션 객체 HTMLCollection 객체 반환
+- css 선택자를 이용한 요소 노드 취득
+  - 스타일을 적용하고자 하는 HTML 요소를 특정할 때 사용하는 문법
+  - document.querySelector()
+  - 문법에 맞지 않는 경우 DOMException 에러 발생
+
+### HTMLCollection과 NodeList
+
+- DOM API가 여러 개의 결과값을 반환하기 위한 DOM 컬렉션 객체
+- 유사 배열 객체이면서 이터러블
+- 스프레드 문법을 사용하여 간단히 배열로 변환 가능
+
+HTMLCollection
+
+- 노드 객체의 상태 변화를 실시간으로 반영
+- 살아 있는 DOM 컬렉션 객체
+
+NodeList
+
+- HTMLCollection 객체의 부작용을 해결하기 위해 querySelectorAll 메서드 사용
+- 실시간으로 노드 객체의 상태 변경을 반영 X
+
+> 노드 객체의 상태 변경과 상관없이 안전하게 DOM 컬렉션을 사용하려면 HTMLCollection이나 NodeList 객체를 배열로 변환하여 사용하기
