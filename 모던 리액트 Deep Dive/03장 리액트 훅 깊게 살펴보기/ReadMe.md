@@ -46,3 +46,34 @@ useEffect(() => {
 ```
 
 ⇒ 함수명을부여하면 useEffect의 목적을 명확히 할 수 있다
+
+### useMemo
+
+비용이 큰 연산에 대한 결과를 저장(메모이제이션)해 두고, 이 저장된 값을 반환하는 훅
+
+### useCallback
+
+- 인수로 넘겨받은 콜백 자체를 기억
+- 특정 함수를 새로 만들지 않고 재사용 (=재생성하지 않는다)
+- useMemo를 사용해서 구현 가능
+- 함수 메모이제이션하는 용도에 사용
+
+useCallback(fn, dependencies)
+
+- fn
+  - 캐싱할 함숫값
+  - 다음 렌더링에서 dependencies 값이 이전과 같으면 react는 같은 함수 다시 반환
+  - dependencies 값이 변경되면 이번 렌더링에서 전달한 함수 반환
+- dependencies: fn 내에서 참조되는 모든 반응형 값의 목록
+
+> useCallback과 useMemo는 모두 동일한 역할
+
+### useRef
+
+- useState와 동일하게 컴포넌트 내부에서 렌더링이 일어나도 변경 가능한 상태값을 저장
+- 객체 내부 current로 값에 접근 또는 변경 가능
+- 값이 변하더라도 렌더링 발생 X
+
+### useContext
+
+props drilling을 극복하기 위해 등장
