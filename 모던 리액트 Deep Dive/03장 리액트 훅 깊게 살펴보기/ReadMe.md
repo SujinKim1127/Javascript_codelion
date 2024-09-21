@@ -77,3 +77,54 @@ useCallback(fn, dependencies)
 ### useContext
 
 props drilling을 극복하기 위해 등장
+
+### useReducer
+
+useState의 심화 버전
+
+- return 값은 길이가 2인 배열
+  - state: 현재 useReducer가 가지고 있는 값
+  - dispatcher
+    - state 업데이트하는 함수
+    - setState는 값을 넘겨주면 여기서는 action을 넘겨줌
+    - action = state 변경
+- 2 ~ 3개의 인수 필요
+  - reducer: useReducer의 기본 action 정의
+  - initialState: useReducer의 초깃값
+  - init
+    - 초깃값을 지연해서 생성시키고 싶을 때 사용
+    - 필수 X
+
+목적
+
+- 복잡한 형태의 state를 사전에 정의된 dispatcher로만 수정 가능하게 제작
+- state 값에 대한 접근은 컴포넌트에서만 가능
+- state 업데이트 상세 정의는 컴포넌트 밖에서
+- state의 업데이트를 미리 정의해 둔 dispatcher로만 제한
+
+> state 값을 변경하는 시나리오를 제한적으로 두고 이에 대한 변경을 빠르게 확인할 수 있도록
+
+### useImperativeHandle
+
+부모에게서 넘겨받은 ref를 원하는 대로 수정할 수 있는 훅
+
+### useLayoutEffect
+
+useEffect와 동일하나, 모든 DOM의 변경 후에 useLayoutEffect의 콜백 함수 실행이 동기적으로 발생
+
+1. 리액트가 DOM 업데이트
+2. useLayoutEffect 실행 (브라우저 변경사항 반영 전에 실행)
+3. 브라우저에 변경 사항 반영
+4. useEffect 실행 (브라우저 변경 사항 반영된 이후에 실행)
+
+DOM은 계산됐지만 이것이 **화면에 반영되기 전에 하고 싶은 작업이 있을때**만!! 사용
+
+ex) DOM요소 기반 애니메이션, 스크롤 위치 제어
+
+### 훅 규칙 : rules-of-hooks
+
+1. 최상위에서만 훅 호출
+   - 반복문이나 조건문, 중천된 함수 내에서 훅 실행X
+   - 이렇게 해야 컴포넌트 렌더링시 항상 동일한 순서로 훅 호출 보장 가능
+2. 훅을 호출할 수 있는 것은 리액트 함수 컴포넌트, 사용자 정의 훅
+   - 일반 자바스크립트 함수에서는 훅 사용 불가능
