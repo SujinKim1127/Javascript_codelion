@@ -128,3 +128,107 @@ ex) DOM요소 기반 애니메이션, 스크롤 위치 제어
    - 이렇게 해야 컴포넌트 렌더링시 항상 동일한 순서로 훅 호출 보장 가능
 2. 훅을 호출할 수 있는 것은 리액트 함수 컴포넌트, 사용자 정의 훅
    - 일반 자바스크립트 함수에서는 훅 사용 불가능
+
+## 사용자 정의 훅 vs 고차 컴포넌트
+
+react에서 재사용할 수 로직을 관리할 수 있는 2가지 방법
+
+- 사용자 정의 훅 (custom hook)
+- 고차 컴포넌트 (higher order component)
+
+### 사용자 정의 훅
+
+- 서로 다른 컴포넌트 내부에서 같은 로직을 공유하고자 할 때 주로 사용
+- react에서만 사용할 수 있는 방식
+- 개발자가 필요한 훅을 만드는 기법
+- use로 시작 (react-hooks/rules-of-hooks 의 도움을 받으려면)
+- 훅에서 필요한 useState와 useEffect 로직을 사용자 정의 훅 내부에 두면 손쉽게 중복되는 로직 관리 가능
+
+사용자 정의 훅 예시
+
+- use-Hooks: https://github.com/uidotdev/usehooks9
+- react-use: https://github.com/streamich/react-use10
+- ahooks: https://github.com/alibaba/hooks
+
+### 고차 컴포넌트
+
+- 컴포넌트 자체 로직을 재사용하기 위한 방법
+- 고차 함수의 일종
+- react에서 고차 컴포넌트로 다양한 최적화나 중복 로직 관리 가능
+- ex) React.memo
+
+React.memo
+
+- props의 변화가 없음에도 렌더링을 방지하기 위해 만들어진 react의 고차 컴포넌트
+- useMemo는 값을 반환받음 → JSX 함수 방식이 아닌 {}을 사용한 할당식 사용
+
+고차 함수를 활용한 리액트 고차 컴포넌트 만들기
+
+- 사용자 인증 정보에 따라 인증된 사용자에게는 개인화된 컴포넌트, 그렇지 않은 사용자에게는 별도로 정의된 공통 컴포넌트를 보여주는 시나리오
+
+```jsx
+interface LoginProps {
+	loginRequired?: boolean
+}
+
+function withLoginComponent<T>(Component: ComponentType<T>) {
+	return function (props: T & LoginProps) {
+		const { loginRequired, ...restProps } = props
+
+		if (loginRequired) {
+			return <>로그인이 필요합니다.</>
+		}
+
+		return <Component {...(restProps as T)} />
+	}
+}
+```
+
+```jsx
+// 원래 구현하고자 하는 컴포넌트를 만들고, withLoginComponent로 감싸기만 하면 끝이다.
+// 로그인 여부, 로그인이 안 되면 다른 컴포넌트를 렌더링하는 책임은 모두
+// 고차 컴포넌트인 withLoginComponent에 맡길 수 있어 매우 편리하다.
+
+const Component = withLoginComponent((props: { value: string }) => {
+  return <h3>{props.value}</h3>;
+});
+
+export default function App() {
+  // 로그인 관련 정보를 가져온다.
+  const isLogin = true;
+  return <Component value="text" loginRequired={isLogin} />;
+  // return <Component value="text" />;
+}
+```
+
+### 사용자 정의 훅이 필요한 경우
+
+- 리액트에서 제공하는 훅으로만 공통 로직을 격리할 수 있는 경우
+- 컴포넌트 내부에 미치는 영향을 최소화 가능
+- 개발자가 훅을 원하는 방향으로만 사용 가능
+- 동일한 로직으로 값을 제공
+- 특정한 훅의 작동을 취하고 싶을때
+
+### 고차 컴포넌트를 사용해야 하는 경우
+
+특정 에러가 발생했을 때 현재 컴포넌트 대신 에러가 발생했음을 알리는 컴포넌트 노출
+
+```jsx
+function HookComponent() {
+  const { loggedIn } = useLogin();
+
+  if (!loggedIn) {
+    return <LoginComponent />;
+  }
+
+  return <>안녕하세요.</>;
+}
+
+const HOCComponent = withLoginComponent(() => {
+  // loggedIn state의 값을 신경 쓰지 않고 그냥 컴포넌트에 필요한 로직만
+  // 추가해서 간단해짐. loggedIn state에 따른 제어는 고차 컴포넌트에서
+  return <>안녕하세요.</>;
+});
+```
+
+렌더링의 결과물에도 영향을 미치는 공통 로직 → 고차 컴포넌트 사용하기
